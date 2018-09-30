@@ -1,0 +1,588 @@
+<head>
+  
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  
+  <style>
+  
+      .header {
+        padding: 10px 16px;
+        background: #0e0e0e;
+        color: #ffffff;
+        height: 64px;
+      }
+      
+      .sticky {
+          z-index:1000;
+        position:fixed;
+        top: 0;
+        width: 100%;
+      }
+
+      #wrapper {
+          
+        padding-left: 250px;
+        transition: all 0.4s ease 0s;
+      }
+      
+      #sidebar-wrapper {
+        margin-left: -250px;
+        top: 64px;
+        left: 250px;
+        width: 250px;
+        background: #CCC;
+        position: fixed;
+        height: 100%;
+        overflow-y: auto;
+        z-index: 500;
+        transition: all 0.4s ease 0s;
+      }
+      
+      #page-content-wrapper {
+        width: 100%;
+      }
+      
+      .sidebar-nav {
+        position: absolute;
+        top: 0;
+        width: 250px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      
+      @media (max-width:767px) {
+      
+          #wrapper {
+            padding-left: 0;
+          }
+      
+          #sidebar-wrapper {
+            left: 0;
+          }
+      
+          #wrapper.active {
+            position: relative;
+            left: 250px;
+          }
+      
+          #wrapper.active #sidebar-wrapper {
+            left: 250px;
+            width: 250px;
+            transition: all 0.4s ease 0s;
+          }
+      
+      }
+      
+      .listing {
+          width:100%;
+          padding-top: 100%;
+          background-color: red;
+          margin: 16px;
+          background-size:cover;
+          overflow:hidden;
+      }
+
+      .listing_text {
+         margin: 0;
+         position: absolute;               
+         top: 50%;                        
+         transform: translate(0, -50%) }   
+      }
+      
+
+    /* General Popup Box */
+    .popupCloseButton {
+      background-color: #fff;
+      border: 3px solid #999;
+      border-radius: 50px;
+      cursor: pointer;
+      display: inline-block;
+      font-family: arial;
+      font-weight: bold;
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      font-size: 25px;
+      line-height: 30px;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+    }
+    
+    .popupCloseButton:hover {
+      background-color: #ccc;
+    }
+
+    /* New User Popup*/ 
+    .new_user_hover{
+        background:rgba(0,0,0,.4);
+        cursor:pointer;
+        display:none;
+        height:100%;
+        position:fixed;
+        text-align:center;
+        top:0;
+        width:100%;
+        z-index:10000;
+    }
+
+    .new_user_hover .new_user_helper{
+        display:inline-block;
+        height:100%;
+        vertical-align:middle;
+    }
+    .new_user_hover > div {
+        background-color: #fff;
+        box-shadow: 10px 10px 60px #555;
+        display: inline-block;
+        height: auto;
+        max-width: 551px;
+        min-height: 100px;
+        vertical-align: middle;
+        width: 60%;
+        position: relative;
+        border-radius: 8px;
+        padding: 15px 5%;
+    }
+
+    .trigger_new_user_popup {
+        cursor: pointer;
+        font-size: 20px;
+        margin: 20px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+     /* Login Popup*/ 
+    .login_hover{
+        background:rgba(0,0,0,.4);
+        cursor:pointer;
+        display:none;
+        height:100%;
+        position:fixed;
+        text-align:center;
+        top:0;
+        width:100%;
+        z-index:10000;
+    }
+
+    .login_hover .login_helper{
+        display:inline-block;
+        height:100%;
+        vertical-align:middle;
+    }
+    .login_hover > div {
+        background-color: #fff;
+        box-shadow: 10px 10px 60px #555;
+        display: inline-block;
+        height: auto;
+        max-width: 551px;
+        min-height: 100px;
+        vertical-align: middle;
+        width: 60%;
+        position: relative;
+        border-radius: 8px;
+        padding: 15px 5%;
+    }
+
+    .trigger_login_popup {
+        cursor: pointer;
+        font-size: 20px;
+        margin: 20px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    /* New Listing Popup */
+    .new_listing_hover{
+        background:rgba(0,0,0,.4);
+        cursor:pointer;
+        display:none;
+        height:100%;
+        position:fixed;
+        text-align:center;
+        top:0;
+        width:100%;
+        z-index:10000;
+    }
+    .new_listing_hover .new_listing_helper{
+        display:inline-block;
+        height:100%;
+        vertical-align:middle;
+    }
+    .new_listing_hover > div {
+        background-color: #fff;
+        box-shadow: 10px 10px 60px #555;
+        display: inline-block;
+        height: auto;
+        max-width: 551px;
+        min-height: 100px;
+        vertical-align: middle;
+        width: 60%;
+        position: relative;
+        border-radius: 8px;
+        padding: 15px 5%;
+    }
+
+    .trigger_new_listing_popup {
+        cursor: pointer;
+        font-size: 20px;
+        margin: 20px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+    <div class="header" id="myHeader">
+      <h1>COLIN'S MARKET</h1>
+    </div>
+
+    <!-- New User Popup -->
+    <div class="new_user_hover">
+        <span class="new_user_helper"></span>
+        <div>
+            <div class="popupCloseButton" id="new_user_popupCloseButton">X</div>
+            <h2>New User</h2>
+            Username: <input id="new_user_username" type="text"><br>
+            Password: <input id="new_user_password" type="password"><br>
+            <button id="new_user_submit">Submit</button>
+        </div>
+    </div>
+
+    <!-- Login Popup -->
+    <div class="login_hover">
+      <span class="login_helper"></span>
+        <div>
+            <div class="popupCloseButton" id="login_popupCloseButton">X</div>
+            <h2>Login</h2>
+            Username: <input id="login_username" type="text"><br>
+            Password: <input id="login_password" type="password"><br>
+            <button id="login_submit">Submit</button>
+        </div>
+    </div>
+
+    <!-- New Listing Popup -->
+    <div class="new_listing_hover">
+      <span class="new_listing_helper"></span>
+        <div>
+            <div class="popupCloseButton" id="new_listing_popupCloseButton">X</div>
+            <h2>Add Listing</h2>
+            Name: <input id="new_listing_name" type="text"><br>
+            Price: $<input id="new_listing_price" type="text"><br>
+            Image: <input id="new_listing_image" type="file"><br>
+            <button id="new_listing_submit">Submit</button>
+        </div>
+    </div>
+
+    <!-- Sidebar --> 
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+
+                <div class="not_logged_in_display">
+                  <li><button id="trigger_new_user_popup">Create User</button></li>
+                  <li><button id="trigger_login_popup">Login</button></li>
+                </div>
+
+                <div class="logged_in_display">
+                  <li>Hello, <div class="username">USERNAME NOT FOUND</div></li>
+                  <li><button id="log_out">Log Out</li>
+                </div>
+
+                <li><h3>Popular Tags<h3></li>
+                <li>Shirts</a></li>
+                <li>Shoes</li>
+                <li>Socks</li>
+                <li></li>
+                <div class="logged_in_display"> 
+                  <li><h3>Current Cart</h3></li>
+                  <!-- TODO make the onclick into a jquery call --> 
+                  <li><button onclick="deleteCart()">Delete Cart</button></li>
+                  <div id="cart_area"></div>
+                  <li></li>
+                </div>
+                <li><button class="logged_in_display" id="trigger_new_listing_popup">Create Listing</button></li>
+            </ul>
+        </div>
+        
+        <div id="listings_area"></div>     
+    </div>
+
+
+    <script>
+      var listings = ""; //all listings on page, this will be updated
+      var user_info = ""; //user info, this will also be updated
+  
+      //Sticky Header
+      window.onscroll = function() {myFunction()};
+
+      var header = document.getElementById("myHeader");
+      var sticky = header.offsetTop;
+      
+      function myFunction() {
+        if (window.pageYOffset > sticky) {
+          header.classList.add("sticky");
+        } else {
+          header.classList.remove("sticky");
+        }
+      }
+
+      //New User Popup 
+      $("#trigger_new_user_popup").click(function(){
+        $('.new_user_hover').show();
+      });
+
+      $('#new_user_popupCloseButton').click(function(){
+        $('.new_user_hover').hide();
+      });
+
+      $('#new_user_submit').click(function(){
+        set_token_and_update_user_info( $('#new_user_username').val(),$('#new_user_password').val());
+        $('.new_user_hover').hide();
+      });
+
+      //Login Popup 
+      $("#trigger_login_popup").click(function(){
+        $('.login_hover').show();
+      });
+
+      $('#login_popupCloseButton').click(function(){
+        $('.login_hover').hide();
+      });
+
+      $('#login_submit').click(function(){
+        set_token_and_update_user_info( $('#login_username').val(),$('#login_password').val());
+        $('.login_hover').hide();
+      });
+
+      //New Listing Popup 
+      $("#trigger_new_listing_popup").click(function(){
+        $('.new_listing_hover').show();
+      });
+
+      $('#new_listing_popupCloseButton').click(function(){
+        $('.new_listing_hover').hide();
+      });
+
+      $('#new_listing_submit').click(function(){
+        console.log($('#new_listing_image').val());
+
+        $.ajax({
+          method: "POST",
+          url: "/api/Upload",
+          data: { name: name, price: price, created_by: user_info.username },
+          success: function(data) {
+            update_listings();
+          }
+        }); 
+
+        add_listing( $('#new_listing_name').val(),$('#new_listing_price').val());
+        $('.new_listing_hover').hide();
+      });
+
+      //Log Out Button 
+      $('#log_out').click(function(){
+        Cookies.remove('token');
+        update_user_info();
+      });
+
+      //Cart Functions
+      function update_cart_display(){ 
+        var cart_area_html = "";
+        var temp_item = "";
+        var cart_total = 0; 
+
+        //Starts at 1 to ignore empty baskets and the colon at start of basket string 
+        for(var i = 1; i < Cookies.get('basket').split(':').length; i++){
+          
+          temp_item = findProductById(Cookies.get('basket').split(':')[i]);
+          if(temp_item == "" ){
+            cart_area_html += 'ITEM NOT FOUND<br>';
+          }else{
+            cart_area_html += temp_item.name + " ... $" + temp_item.price + '<br>';
+            cart_total += temp_item.price;
+          }
+        }
+
+        cart_area_html += "TOTAL ... $" + cart_total; 
+        $("#cart_area").html(cart_area_html);
+
+      }
+
+      function putInCart(id){
+
+        Cookies.set('basket', Cookies.get('basket') + ":" + id, { expires: 1 });
+
+        var cart_list_html = "";
+
+        update_cart_display();
+ 
+      }
+
+      function deleteCart(){
+        Cookies.remove('basket');
+        Cookies.set('basket',"", { expires: 1 });
+        update_cart_display();
+      }
+
+
+      //User create and Login Functions 
+      function set_token_and_update_user_info(username,password){
+        $.ajax({
+          method: "POST",
+          url: "/users/create/",
+          data: { username: username, password: password },
+          success: function(data) {
+            Cookies.set('token', data, { expires: 1 });
+            update_user_info();
+          }
+        }); 
+      }
+
+      function update_user_info(){
+
+        user_info = ""; //clearing user_info
+
+        if (Cookies.get('token') != null){
+
+          $.ajax({
+            method: "GET",
+            url: "/users/" + Cookies.get('token'),
+            dataType: 'json',
+            success: function(data) {
+              if(data==""){
+                Cookies.remove('token'); //token not found 
+              }
+              user_info = data;
+              update_user_info_display();
+              update_listings(); 
+            }
+          });
+
+        }else{
+          update_user_info_display();
+          update_listings(); 
+        }
+      }
+
+      function update_user_info_display(){
+
+        if (Cookies.get('token') != null){
+          $(".username").html(user_info.username);
+          $('.not_logged_in_display').hide();
+          $('.logged_in_display').show();
+        }else{
+          $('.not_logged_in_display').show();
+          $('.logged_in_display').hide();
+        }
+
+      }
+  
+      //Returns product based on _id 
+      //TODO change this from the O(n) solution 
+      function findProductById(_id){
+        for(var i = 0; i < listings.length; i++){
+          if(listings[i]._id == _id){
+            return listings[i];
+          }
+        }
+        return "";
+      }
+
+      function add_listing(name,price){
+        $.ajax({
+          method: "POST",
+          url: "/products/create/",
+          data: { name: name, price: price, created_by: user_info.username },
+          success: function(data) {
+            update_listings();
+          }
+        }); 
+
+      }
+
+      function delete_listing(_id){
+        $.ajax({
+          method: "DELETE",
+          url: "/products/" + _id + "/delete/",
+          success: function(data) {
+            update_listings();
+          }
+        }); 
+
+      }
+
+      //Adding All Listings To Page 
+      function update_listings (){
+        var data;
+
+        $.ajax({
+            method: "GET",
+            url: "/products/all",
+            dataType: 'json',
+            success: function(data) {
+              listings = data;
+              update_listings_display();
+              update_cart_display();
+            }
+          });    
+  
+      }
+
+      function update_listings_display(){
+          var listings_area_html = ""; 
+
+          for(var i = 0; i < listings.length; i++){
+
+            var user_owns = 0; 
+            if(listings[i].created_by == user_info.username){
+              user_owns = 1; 
+            }
+
+            listings_area_html += "<div class='col-lg-3 col-md-3 col-sm-6 col-xs-12'>";
+            listings_area_html += "<div class='listing' id='listing_" + i + "'>"
+            listings_area_html += "<div class='listing_text'>";
+            listings_area_html += listings[i].name + "<br>" + listings[i].price + "<br>" + listings[i].created_by + "<br>";
+            listings_area_html += "<button onclick='putInCart(\"" + listings[i]._id + "\")'>Put In Cart</button>";
+
+            if(user_owns){
+              listings_area_html += "<button onclick='delete_listing(\"" + listings[i]._id + "\")'>Delete Item</button>";
+            }
+
+            listings_area_html += "</div>"; //closing listing_text div 
+            listings_area_html += "</div></div>";
+          }
+
+          $("#listings_area").html(listings_area_html);
+
+      }
+
+      //On Page Load
+      $(document).ready(function(){
+
+        //Creating basket cookie if it doesn't exist
+        if(Cookies.get('basket') == 'undefined'){
+          Cookies.set('basket',"", { expires: 1 });
+        }
+
+        update_user_info();
+
+      });
+
+    </script>
+
+    
+
+</body>
+
